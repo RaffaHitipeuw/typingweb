@@ -1,0 +1,25 @@
+ .statsContainer {
+    display: flex;
+    justify-content: center; 
+    gap: 40px; 
+    padding: 15px 0;
+    margin-bottom: 30px;
+}
+
+.statItem {
+    text-align: center;
+    padding: 0;
+}
+
+.statValue {
+    font-size: 32px;
+    font-weight: 500;
+    color: white; 
+}
+
+.statLabel {
+    display: block;
+    color: white;
+    font-size: 14px;
+    margin-top: 5px;
+}

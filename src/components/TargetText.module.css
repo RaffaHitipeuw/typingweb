@@ -1,0 +1,39 @@
+/* File: TargetText.module.css */
+
+.textContainer {
+    padding: 0;
+    margin: 0 0 50px 0; 
+    line-height: 1.5;
+    font-size: 28px; 
+    white-space: pre-wrap;
+    word-break: break-word;
+    text-align: center;
+}
+
+.charCorrect {
+    color: #d1d0c5; 
+}
+
+.charIncorrect {
+    color: #ca4754; 
+    background-color: transparent;
+    font-weight: normal;
+    text-decoration: none; 
+    border-bottom: 2px solid #ca4754;
+}
+
+.charPending {
+    color: #646669; 
+}
+
+.charCursor {
+    color: white; 
+    border-bottom: none;
+    background-color: white; 
+    animation: blink 0.8s infinite;
+}
+
+@keyframes blink {
+    0%, 100% { background-color: white; color: #323437; }
+    50% { background-color: transparent; color: white; }
+}
