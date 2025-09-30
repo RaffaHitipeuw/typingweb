@@ -4,7 +4,8 @@ import React, { useState, useEffect, useRef } from "react";
 import TargetText from "../components/TargetText"; 
 import StatsDisplay from "../components/StatsDisplay"; 
 import sharedStyles from "../components/SharedStyles.module.css"; 
-import { addScore } from '../components/leaderboard/localStorageHandler';
+// Mengganti LocalStorage dengan Handler API untuk Leaderboard publik
+import { addScore } from '../components/leaderboard/scoreApiHandler';
 import Leaderboard from '../components/leaderboard/Leaderboard'; 
 
 const sampleTexts = [
@@ -29,9 +30,11 @@ export default function Page() {
     const [errorActive, setErrorActive] = useState(false);
     const [mistakeCount, setMistakeCount] = useState(0); 
     const [latestScore, setLatestScore] = useState(null); 
+    const [username, setUsername] = useState(''); // State untuk nama pengguna
 
     const inputRef = useRef(null);
 
+    // useEffect untuk menangani akhir tes dan penyimpanan skor ke API
     useEffect(() => {
         if (finished) {
             const finalEndTime = Date.now();
@@ -40,13 +43,21 @@ export default function Page() {
             const finalWPM = wpm(finalEndTime);
             const finalAccuracy = accuracyPercent();
             
-            if (finalWPM > 0) {
-                addScore(finalWPM, finalAccuracy);
-                setLatestScore({ wpm: finalWPM, accuracy: finalAccuracy });
+            if (finalWPM > 0 && username.trim().length > 0) {
+                // Fungsi asinkron untuk menyimpan skor
+                const saveScore = async () => {
+                    await addScore(finalWPM, finalAccuracy, username);
+                    // Pemicu Leaderboard refresh setelah penyimpanan berhasil
+                    setLatestScore({ wpm: finalWPM, accuracy: finalAccuracy, username });
+                };
+                saveScore();
+            } else if (finalWPM > 0 && username.trim().length === 0) {
+                alert("Masukkan Nama Pengguna Anda untuk menyimpan skor di Leaderboard!");
             }
         }
-    }, [finished]);
+    }, [finished, username]); 
     
+    // useEffect untuk shortcut keyboard (ESC dan ENTER)
     useEffect(() => {
         const handleKeyPress = (e) => {
             if (e.key === 'Escape' || (finished && e.key === 'Enter')) {
@@ -90,6 +101,7 @@ export default function Page() {
         
         if (finished) return; 
 
+        // Penanganan Backspace
         if (value.length < typed.length) {
              setTyped(value);
              setErrorActive(false);
@@ -102,14 +114,17 @@ export default function Page() {
 
         const expectedChar = sampleText[value.length - 1];
         
+        // Penanganan Kesalahan
         if (lastTypedChar !== expectedChar) {
             setMistakeCount(prev => prev + 1);
             setErrorActive(true);
             return; 
         }
 
+        // Jika Benar
         setErrorActive(false); 
         
+        // Mulai Timer
         if (!started && value.length > 0) {
             setStarted(true);
             setStartTime(Date.now());
@@ -117,6 +132,7 @@ export default function Page() {
         
         setTyped(value);
         
+        // Pengecekan Selesai
         if (value.length === sampleText.length) {
             setFinished(true);
         }
@@ -145,6 +161,18 @@ export default function Page() {
             }}
         >
             <h1 className={sharedStyles.header}>typing test</h1> 
+            
+            {/* Input Username */}
+            <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Masukkan Nama Pengguna"
+                maxLength={20}
+                className={sharedStyles.input} 
+                disabled={started} // Tidak bisa diubah saat tes berjalan
+                style={{ marginBottom: '15px', padding: '10px', width: '90%', textAlign: 'center' }}
+            />
             
             <TargetText 
                 sampleText={sampleText} 
@@ -180,6 +208,7 @@ export default function Page() {
                 {finished ? "RESTART (ENTER)" : "RESTART (ESC)"}
             </button>
             
+            {/* Komponen Leaderboard */}
             <Leaderboard latestScore={latestScore} />
         </div>
     );
