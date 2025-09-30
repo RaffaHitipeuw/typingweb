@@ -1,4 +1,3 @@
-// File: StatsDisplay.jsx
 import React from 'react';
 import styles from './StatsDisplay.module.css'; 
 

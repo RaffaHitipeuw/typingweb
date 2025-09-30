@@ -9,10 +9,8 @@ export default function TargetText({ sampleText, typed, finished, errorActive })
             let className = styles.charPending;
             
             if (index < typed.length) {
-                // Di Strict Mode, ini harus selalu benar (kecuali ada logic backspace)
                 className = styles.charCorrect; 
             } else if (index === typed.length && !finished) {
-                // Gunakan class error jika errorActive true, jika tidak, gunakan class normal
                 className += ' ' + (errorActive ? styles.charCursorError : styles.charCursor); 
             }
 
@@ -22,7 +20,6 @@ export default function TargetText({ sampleText, typed, finished, errorActive })
                 </span>
             );
         });
-        // Karena ini Strict Mode, kita tidak perlu logic untuk kelebihan ketikan
     }
 
     return (

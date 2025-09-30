@@ -1,10 +1,11 @@
-// File: page.jsx (atau src/app/page.jsx)
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
 import TargetText from "../components/TargetText"; 
 import StatsDisplay from "../components/StatsDisplay"; 
 import sharedStyles from "../components/SharedStyles.module.css"; 
+import { addScore } from '../components/Leaderboard/localStorageHandler';
+import Leaderboard from '../components/Leaderboard/Leaderboard'; 
 
 const sampleTexts = [
     "the quick brown fox jumps over the lazy dog",
@@ -25,13 +26,25 @@ export default function Page() {
     const [startTime, setStartTime] = useState(null);
     const [endTime, setEndTime] = useState(null);
     const [finished, setFinished] = useState(false);
-    const [errorActive, setErrorActive] = useState(false); // State baru untuk error visual
+    const [errorActive, setErrorActive] = useState(false);
     const [mistakeCount, setMistakeCount] = useState(0); 
+    const [latestScore, setLatestScore] = useState(null); 
 
     const inputRef = useRef(null);
 
     useEffect(() => {
-        if (finished) setEndTime(Date.now());
+        if (finished) {
+            const finalEndTime = Date.now();
+            setEndTime(finalEndTime);
+            
+            const finalWPM = wpm(finalEndTime);
+            const finalAccuracy = accuracyPercent();
+            
+            if (finalWPM > 0) {
+                addScore(finalWPM, finalAccuracy);
+                setLatestScore({ wpm: finalWPM, accuracy: finalAccuracy });
+            }
+        }
     }, [finished]);
     
     useEffect(() => {
@@ -57,14 +70,14 @@ export default function Page() {
         return Math.round((correct / totalKeystrokes) * 100 * 100) / 100;
     }
 
-    function elapsedSeconds() { 
-        if (!started) return 0;
-        const end = endTime || Date.now();
+    function elapsedSeconds(endOverride = endTime) { 
+        if (!started || !startTime) return 0;
+        const end = endOverride || Date.now();
         return Math.max(0, Math.floor((end - startTime) / 1000));
     }
 
-    function wpm() { 
-        const seconds = elapsedSeconds();
+    function wpm(endOverride) { 
+        const seconds = elapsedSeconds(endOverride);
         if (seconds === 0) return 0;
         const minutes = seconds / 60;
         const correct = typed.length; 
@@ -79,7 +92,7 @@ export default function Page() {
 
         if (value.length < typed.length) {
              setTyped(value);
-             setErrorActive(false); // Reset error jika backspace
+             setErrorActive(false);
              return;
         }
 
@@ -90,13 +103,11 @@ export default function Page() {
         const expectedChar = sampleText[value.length - 1];
         
         if (lastTypedChar !== expectedChar) {
-            // Mencegah input, mengaktifkan visual error, dan mencatat kesalahan
             setMistakeCount(prev => prev + 1);
             setErrorActive(true);
             return; 
         }
 
-        // Jika benar:
         setErrorActive(false); 
         
         if (!started && value.length > 0) {
@@ -120,6 +131,7 @@ export default function Page() {
         setMistakeCount(0); 
         setErrorActive(false); 
         setSampleText(getRandomText());
+        setLatestScore(null); 
         if (inputRef.current) inputRef.current.focus();
     }
     
@@ -138,7 +150,7 @@ export default function Page() {
                 sampleText={sampleText} 
                 typed={typed} 
                 finished={finished} 
-                errorActive={errorActive} // Teruskan state error
+                errorActive={errorActive}
             />
 
             <textarea
@@ -167,6 +179,8 @@ export default function Page() {
             >
                 {finished ? "RESTART (ENTER)" : "RESTART (ESC)"}
             </button>
+            
+            <Leaderboard latestScore={latestScore} />
         </div>
     );
 }

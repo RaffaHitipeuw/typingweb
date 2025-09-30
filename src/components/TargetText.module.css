@@ -1,5 +1,3 @@
-/* File: TargetText.module.css (DIPERBARUI - TANPA BLINK) */
-
 .textContainer {
     padding: 0;
     margin: 0 0 50px 0; 
@@ -26,16 +24,15 @@
     color: #646669; 
 }
 
-/* Kursor Normal (Kuning) - Tetap solid */
 .charCursor {
-    color: #323437; /* Teks gelap di atas background */
+    color: #323437;
     border-bottom: none;
-    background-color: white; /* Kuning solid */
+    background-color: white;
 }
 
-/* Kursor Error (Merah Terang) - Tetap solid */
+
 .charCursorError {
-    color: #323437; /* Teks gelap di atas background merah */
+    color: #323437; 
     border-bottom: none;
-    background-color: red; /* Merah solid */
+    background-color: red;
 }
