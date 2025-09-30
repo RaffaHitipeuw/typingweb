@@ -25,6 +25,8 @@ export default function Page() {
     const [startTime, setStartTime] = useState(null);
     const [endTime, setEndTime] = useState(null);
     const [finished, setFinished] = useState(false);
+    const [errorActive, setErrorActive] = useState(false); // State baru untuk error visual
+    const [mistakeCount, setMistakeCount] = useState(0); 
 
     const inputRef = useRef(null);
 
@@ -32,7 +34,6 @@ export default function Page() {
         if (finished) setEndTime(Date.now());
     }, [finished]);
     
-    // Logic: Mengaktifkan restart dengan tombol ESC atau ENTER
     useEffect(() => {
         const handleKeyPress = (e) => {
             if (e.key === 'Escape' || (finished && e.key === 'Enter')) {
@@ -42,20 +43,18 @@ export default function Page() {
 
         window.addEventListener('keydown', handleKeyPress);
         return () => window.removeEventListener('keydown', handleKeyPress);
-    }, [finished]); // Dependensi [finished] agar listener tahu status tes
+    }, [finished]);
 
     function correctChars(text = typed) { 
-        let correct = 0;
-        for (let i = 0; i < text.length && i < sampleText.length; i++) {
-            if (text[i] === sampleText[i]) correct++;
-        }
-        return correct;
+        return text.length;
     }
 
     function accuracyPercent() { 
-        if (typed.length === 0) return 0;
-        const correct = correctChars();
-        return Math.round((correct / typed.length) * 100 * 100) / 100;
+        const totalKeystrokes = typed.length + mistakeCount;
+        if (totalKeystrokes === 0) return 0;
+        
+        const correct = typed.length;
+        return Math.round((correct / totalKeystrokes) * 100 * 100) / 100;
     }
 
     function elapsedSeconds() { 
@@ -68,7 +67,7 @@ export default function Page() {
         const seconds = elapsedSeconds();
         if (seconds === 0) return 0;
         const minutes = seconds / 60;
-        const correct = correctChars();
+        const correct = typed.length; 
         return Math.round((correct / 5) / minutes);
     }
     
@@ -76,25 +75,30 @@ export default function Page() {
         const value = e.target.value;
         const lastTypedChar = value[value.length - 1];
         
-        // 1. Mencegah ketikan jika sudah selesai
         if (finished) return; 
 
-        // Mencegah menghapus karakter saat sudah selesai (opsional, tapi baik untuk strict mode)
         if (value.length < typed.length) {
              setTyped(value);
+             setErrorActive(false); // Reset error jika backspace
              return;
         }
 
-        // 2. Menerapkan Strict Mode (harus benar-benar sesuai)
+        if (typed.length >= sampleText.length) {
+            return;
+        }
+
         const expectedChar = sampleText[value.length - 1];
         
-        // Cek jika karakter terakhir yang diketik tidak sesuai DENGAN KARAKTER BERIKUTNYA
         if (lastTypedChar !== expectedChar) {
-            // Jika salah, jangan update state 'typed'
+            // Mencegah input, mengaktifkan visual error, dan mencatat kesalahan
+            setMistakeCount(prev => prev + 1);
+            setErrorActive(true);
             return; 
         }
 
-        // Jika sampai di sini, karakter yang diketik benar
+        // Jika benar:
+        setErrorActive(false); 
+        
         if (!started && value.length > 0) {
             setStarted(true);
             setStartTime(Date.now());
@@ -102,7 +106,6 @@ export default function Page() {
         
         setTyped(value);
         
-        // 3. Menandai Selesai saat semua karakter di sampleText sudah terketik dengan benar
         if (value.length === sampleText.length) {
             setFinished(true);
         }
@@ -114,6 +117,8 @@ export default function Page() {
         setStartTime(null);
         setEndTime(null);
         setFinished(false);
+        setMistakeCount(0); 
+        setErrorActive(false); 
         setSampleText(getRandomText());
         if (inputRef.current) inputRef.current.focus();
     }
@@ -133,6 +138,7 @@ export default function Page() {
                 sampleText={sampleText} 
                 typed={typed} 
                 finished={finished} 
+                errorActive={errorActive} // Teruskan state error
             />
 
             <textarea
@@ -151,7 +157,7 @@ export default function Page() {
                 wpm={wpm()}
                 accuracyPercent={accuracyPercent()}
                 elapsedSeconds={elapsedSeconds()}
-                correctChars={correctChars()}
+                correctChars={typed.length}
                 sampleLength={sampleText.length}
             />
 

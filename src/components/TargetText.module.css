@@ -1,4 +1,4 @@
-/* File: TargetText.module.css */
+/* File: TargetText.module.css (DIPERBARUI - TANPA BLINK) */
 
 .textContainer {
     padding: 0;
@@ -26,14 +26,16 @@
     color: #646669; 
 }
 
+/* Kursor Normal (Kuning) - Tetap solid */
 .charCursor {
-    color: white; 
+    color: #323437; /* Teks gelap di atas background */
     border-bottom: none;
-    background-color: white; 
-    animation: blink 0.8s infinite;
+    background-color: white; /* Kuning solid */
 }
 
-@keyframes blink {
-    0%, 100% { background-color: white; color: #323437; }
-    50% { background-color: transparent; color: white; }
+/* Kursor Error (Merah Terang) - Tetap solid */
+.charCursorError {
+    color: #323437; /* Teks gelap di atas background merah */
+    border-bottom: none;
+    background-color: red; /* Merah solid */
 }

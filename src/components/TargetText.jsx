@@ -2,16 +2,18 @@
 import React from 'react';
 import styles from './TargetText.module.css'; 
 
-export default function TargetText({ sampleText, typed, finished }) {
+export default function TargetText({ sampleText, typed, finished, errorActive }) {
 
     function renderText() {
         return Array.from(sampleText).map((char, index) => {
             let className = styles.charPending;
             
             if (index < typed.length) {
-                className = typed[index] === char ? styles.charCorrect : styles.charIncorrect;
+                // Di Strict Mode, ini harus selalu benar (kecuali ada logic backspace)
+                className = styles.charCorrect; 
             } else if (index === typed.length && !finished) {
-                className += ' ' + styles.charCursor; 
+                // Gunakan class error jika errorActive true, jika tidak, gunakan class normal
+                className += ' ' + (errorActive ? styles.charCursorError : styles.charCursor); 
             }
 
             return (
@@ -19,13 +21,8 @@ export default function TargetText({ sampleText, typed, finished }) {
                     {char}
                 </span>
             );
-        }).concat(
-            typed.length > sampleText.length 
-              ? <span key="extra" className={styles.charIncorrect}>
-                  {typed.substring(sampleText.length)}
-                </span>
-              : null
-        );
+        });
+        // Karena ini Strict Mode, kita tidak perlu logic untuk kelebihan ketikan
     }
 
     return (
