@@ -7,7 +7,7 @@ import StatsDisplay from "../components/StatsDisplay";
 import sharedStyles from "../components/SharedStyles.module.css"; 
 
 const sampleTexts = [
-"the quick brown fox jumps over the lazy dog",
+    "the quick brown fox jumps over the lazy dog",
     "programming language is a formal constructed language designed to communicate",
     "a computer program is a collection of instructions that can be executed by a computer",
     "she sees the sun and knows that time will bring them home to the main area",
@@ -15,7 +15,7 @@ const sampleTexts = [
 ];
 
 function getRandomText() {
-  return sampleTexts[Math.floor(Math.random() * sampleTexts.length)];
+    return sampleTexts[Math.floor(Math.random() * sampleTexts.length)];
 }
 
 export default function Page() {
@@ -32,6 +32,18 @@ export default function Page() {
         if (finished) setEndTime(Date.now());
     }, [finished]);
     
+    // Logic: Mengaktifkan restart dengan tombol ESC atau ENTER
+    useEffect(() => {
+        const handleKeyPress = (e) => {
+            if (e.key === 'Escape' || (finished && e.key === 'Enter')) {
+                reset();
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyPress);
+        return () => window.removeEventListener('keydown', handleKeyPress);
+    }, [finished]); // Dependensi [finished] agar listener tahu status tes
+
     function correctChars(text = typed) { 
         let correct = 0;
         for (let i = 0; i < text.length && i < sampleText.length; i++) {
@@ -62,15 +74,36 @@ export default function Page() {
     
     function handleChange(e) { 
         const value = e.target.value;
+        const lastTypedChar = value[value.length - 1];
+        
+        // 1. Mencegah ketikan jika sudah selesai
         if (finished) return; 
 
+        // Mencegah menghapus karakter saat sudah selesai (opsional, tapi baik untuk strict mode)
+        if (value.length < typed.length) {
+             setTyped(value);
+             return;
+        }
+
+        // 2. Menerapkan Strict Mode (harus benar-benar sesuai)
+        const expectedChar = sampleText[value.length - 1];
+        
+        // Cek jika karakter terakhir yang diketik tidak sesuai DENGAN KARAKTER BERIKUTNYA
+        if (lastTypedChar !== expectedChar) {
+            // Jika salah, jangan update state 'typed'
+            return; 
+        }
+
+        // Jika sampai di sini, karakter yang diketik benar
         if (!started && value.length > 0) {
             setStarted(true);
             setStartTime(Date.now());
         }
+        
         setTyped(value);
         
-        if (value.length >= sampleText.length && correctChars(value) === sampleText.length) {
+        // 3. Menandai Selesai saat semua karakter di sampleText sudah terketik dengan benar
+        if (value.length === sampleText.length) {
             setFinished(true);
         }
     }
