@@ -4,8 +4,8 @@ import React, { useState, useEffect, useRef } from "react";
 import TargetText from "../components/TargetText"; 
 import StatsDisplay from "../components/StatsDisplay"; 
 import sharedStyles from "../components/SharedStyles.module.css"; 
-import { addScore } from '../components/Leaderboard/localStorageHandler';
-import Leaderboard from '../components/Leaderboard/Leaderboard'; 
+import { addScore } from '../components/leaderboard/localStorageHandler';
+import Leaderboard from '../components/leaderboard/Leaderboard'; 
 
 const sampleTexts = [
     "the quick brown fox jumps over the lazy dog",
