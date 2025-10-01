@@ -53,17 +53,3 @@
   font-size: 0.8em;
   color: #777;
 }
-
-.clear-button {
-  background-color: #dc3545;
-  color: white;
-  border: none;
-  padding: 8px 15px;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-bottom: 20px;
-}
-
-.clear-button:hover {
-  background-color: #c82333;
-}

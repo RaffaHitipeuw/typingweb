@@ -5,11 +5,8 @@ import dynamic from 'next/dynamic';
 import TargetText from "../components/TargetText"; 
 import StatsDisplay from "../components/StatsDisplay"; 
 import sharedStyles from "../components/SharedStyles.module.css"; 
-// Ganti ke nama file handler API Anda yang benar
 import { addScore } from '../components/leaderboard/localStorageHandler'; 
 
-// Dynamic Import untuk Leaderboard (ssr: false)
-// Ini mencegah error Hydration karena Leaderboard dimuat hanya di browser
 const Leaderboard = dynamic(
     () => import('../components/leaderboard/Leaderboard'),
     { ssr: false } 
@@ -21,6 +18,12 @@ const sampleTexts = [
     "a computer program is a collection of instructions that can be executed by a computer",
     "she sees the sun and knows that time will bring them home to the main area",
     "they are known to follow the great white shark across the wide open sea",
+    "Artificial intelligence is rapidly changing the way we interact with technology every day",
+    "The sun set slowly over the horizon, painting the clouds in shades of orange and deep violet",
+    "In the midst of chaos, there is also opportunity",
+    "To be yourself in a world that is constantly trying to make you something else is the greatest accomplishment",
+    "Life is what happens when you're busy making other plans"
+
 ];
 
 function getRandomText() {
@@ -39,14 +42,12 @@ export default function Page() {
     const [latestScore, setLatestScore] = useState(null); 
     const [username, setUsername] = useState(''); 
     
-    // State BARU untuk mengontrol render setelah komponen di-mount
+
     const [isMounted, setIsMounted] = useState(false); 
 
     const inputRef = useRef(null);
 
-    // useEffect utama: Mengatur penyimpanan skor dan menandai komponen sudah di-mount
     useEffect(() => {
-        // Tandai komponen sudah di-mount di klien
         setIsMounted(true); 
         
         if (finished) {
@@ -57,10 +58,8 @@ export default function Page() {
             const finalAccuracy = accuracyPercent();
             
             if (finalWPM > 0 && username.trim().length > 0) {
-                // Fungsi asinkron untuk menyimpan skor
                 const saveScore = async () => {
                     await addScore(finalWPM, finalAccuracy, username);
-                    // Pemicu Leaderboard refresh setelah penyimpanan berhasil
                     setLatestScore({ wpm: finalWPM, accuracy: finalAccuracy, username });
                 };
                 saveScore();

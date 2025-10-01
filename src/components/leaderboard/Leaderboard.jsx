@@ -41,10 +41,6 @@ function Leaderboard({ latestScore }) {
     <div className="leaderboard-container">
       <h2>🏆 Global Leaderboard 🏆</h2>
       
-      <button onClick={handleClearScores} className="clear-button" disabled>
-        Hapus Riwayat (Disabled)
-      </button>
-      
       {scores.length === 0 ? (
         <p>Belum ada skor global. Jadilah yang pertama!</p>
       ) : (
