@@ -11,7 +11,7 @@ import { addScore } from '../components/leaderboard/localStorageHandler';
 // Dynamic Import untuk Leaderboard (ssr: false)
 // Ini mencegah error Hydration karena Leaderboard dimuat hanya di browser
 const Leaderboard = dynamic(
-    () => import('../components/Leaderboard/Leaderboard'),
+    () => import('../components/leaderboard/Leaderboard'),
     { ssr: false } 
 );
 
