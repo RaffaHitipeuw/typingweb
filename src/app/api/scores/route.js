@@ -1,13 +1,8 @@
-// src/app/api/scores/route.js
-
 import { connectToDatabase } from '../../../lib/mongodb';
 import { NextResponse } from 'next/server';
 
 const COLLECTION_NAME = 'scores';
 
-/**
- * Handle GET (Mengambil Leaderboard dari MongoDB)
- */
 export async function GET() {
   try {
     const { db } = await connectToDatabase();
@@ -25,9 +20,7 @@ export async function GET() {
   }
 }
 
-/**
- * Handle POST (Menyimpan Skor Baru ke MongoDB)
- */
+
 export async function POST(req) {
   try {
     const { wpm, accuracy, username } = await req.json();

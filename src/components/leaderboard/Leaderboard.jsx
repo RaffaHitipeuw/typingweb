@@ -1,9 +1,6 @@
-// components/Leaderboard/Leaderboard.jsx
-
 "use client";
 
 import React, { useState, useEffect } from 'react';
-// Pastikan nama file handler Anda (misalnya localStorageHandler) di-import di sini
 import { getScores } from './localStorageHandler'; 
 import './Leaderboard.css';
 
@@ -28,7 +25,7 @@ function Leaderboard({ latestScore }) {
     }
   }, [latestScore]);
 
-  // Tombol Hapus dinonaktifkan untuk Leaderboard publik
+
   const handleClearScores = () => {
     alert("Fitur hapus dinonaktifkan untuk Leaderboard publik.");
   };
@@ -46,15 +43,12 @@ function Leaderboard({ latestScore }) {
       ) : (
         <ol className="score-list">
           {scores.map((score, index) => (
-            // Menggunakan score._id dari MongoDB jika ada, jika tidak pakai index
             <li key={score._id || index} className="score-item">
               <span className="wpm-display">{score.wpm} WPM</span>
-              {/* Menampilkan username yang diambil dari database */}
               <span className="accuracy-display">
                   {score.username} ({score.accuracy}% Akurasi)
               </span>
               <span className="date-display">
-                {/* Kita biarkan ini karena Leaderboard dimuat ssr:false, jadi ini aman */}
                 {new Date(score.timestamp).toLocaleDateString()}
               </span>
             </li>

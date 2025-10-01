@@ -1,6 +1,3 @@
-// components/Leaderboard/localStorageHandler.js
-
-// Konstanta untuk path API Anda
 const API_URL = '/api/scores';
 
 export const getScores = async () => {
@@ -32,6 +29,3 @@ export const addScore = async (wpm, accuracy, username) => {
         console.error("Gagal mengirim skor ke API:", e);
     }
 };
-
-// Fungsi ini tidak diimplementasikan untuk leaderboard publik
-// export const clearScores = () => {};

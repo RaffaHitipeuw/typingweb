@@ -1,4 +1,3 @@
-// File: TargetText.jsx
 import React from 'react';
 import styles from './TargetText.module.css'; 
 

@@ -1,5 +1,3 @@
-// components/Leaderboard/localStorageHandler.js
-
 const STORAGE_KEY = 'typingTestScores';
 
 export const getScores = () => {

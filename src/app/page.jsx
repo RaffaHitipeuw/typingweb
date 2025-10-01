@@ -69,7 +69,6 @@ export default function Page() {
         }
     }, [finished, username]); 
     
-    // useEffect untuk shortcut keyboard (ESC dan ENTER)
     useEffect(() => {
         const handleKeyPress = (e) => {
             if (e.key === 'Escape' || (finished && e.key === 'Enter')) {
@@ -158,7 +157,7 @@ export default function Page() {
         if (inputRef.current) inputRef.current.focus();
     }
     
-    // Render minimal jika belum di-mount untuk menghindari Hydration Error
+
     if (!isMounted) {
         return (
             <div className={sharedStyles.container}>
@@ -168,7 +167,6 @@ export default function Page() {
         );
     }
 
-    // Render penuh setelah komponen di-mount di klien
     return (
         <div 
             className={sharedStyles.container}
@@ -179,8 +177,7 @@ export default function Page() {
             }}
         >
             <h1 className={sharedStyles.header}>typing test</h1> 
-            
-            {/* Input Username */}
+
             <input
                 type="text"
                 value={username}
@@ -226,7 +223,7 @@ export default function Page() {
                 {finished ? "RESTART (ENTER)" : "RESTART (ESC)"}
             </button>
             
-            {/* Komponen Leaderboard yang dimuat secara dinamis */}
+
             <Leaderboard latestScore={latestScore} />
         </div>
     );
