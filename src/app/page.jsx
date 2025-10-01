@@ -1,12 +1,19 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import dynamic from 'next/dynamic'; 
 import TargetText from "../components/TargetText"; 
 import StatsDisplay from "../components/StatsDisplay"; 
 import sharedStyles from "../components/SharedStyles.module.css"; 
-// Mengganti LocalStorage dengan Handler API untuk Leaderboard publik
-import { addScore } from '../components/leaderboard/scoreApiHandler';
-import Leaderboard from '../components/leaderboard/Leaderboard'; 
+// Ganti ke nama file handler API Anda yang benar
+import { addScore } from '../components/Leaderboard/localStorageHandler'; 
+
+// Dynamic Import untuk Leaderboard (ssr: false)
+// Ini mencegah error Hydration karena Leaderboard dimuat hanya di browser
+const Leaderboard = dynamic(
+    () => import('../components/Leaderboard/Leaderboard'),
+    { ssr: false } 
+);
 
 const sampleTexts = [
     "the quick brown fox jumps over the lazy dog",
@@ -30,12 +37,18 @@ export default function Page() {
     const [errorActive, setErrorActive] = useState(false);
     const [mistakeCount, setMistakeCount] = useState(0); 
     const [latestScore, setLatestScore] = useState(null); 
-    const [username, setUsername] = useState(''); // State untuk nama pengguna
+    const [username, setUsername] = useState(''); 
+    
+    // State BARU untuk mengontrol render setelah komponen di-mount
+    const [isMounted, setIsMounted] = useState(false); 
 
     const inputRef = useRef(null);
 
-    // useEffect untuk menangani akhir tes dan penyimpanan skor ke API
+    // useEffect utama: Mengatur penyimpanan skor dan menandai komponen sudah di-mount
     useEffect(() => {
+        // Tandai komponen sudah di-mount di klien
+        setIsMounted(true); 
+        
         if (finished) {
             const finalEndTime = Date.now();
             setEndTime(finalEndTime);
@@ -101,7 +114,6 @@ export default function Page() {
         
         if (finished) return; 
 
-        // Penanganan Backspace
         if (value.length < typed.length) {
              setTyped(value);
              setErrorActive(false);
@@ -114,17 +126,14 @@ export default function Page() {
 
         const expectedChar = sampleText[value.length - 1];
         
-        // Penanganan Kesalahan
         if (lastTypedChar !== expectedChar) {
             setMistakeCount(prev => prev + 1);
             setErrorActive(true);
             return; 
         }
 
-        // Jika Benar
         setErrorActive(false); 
         
-        // Mulai Timer
         if (!started && value.length > 0) {
             setStarted(true);
             setStartTime(Date.now());
@@ -132,7 +141,6 @@ export default function Page() {
         
         setTyped(value);
         
-        // Pengecekan Selesai
         if (value.length === sampleText.length) {
             setFinished(true);
         }
@@ -151,6 +159,17 @@ export default function Page() {
         if (inputRef.current) inputRef.current.focus();
     }
     
+    // Render minimal jika belum di-mount untuk menghindari Hydration Error
+    if (!isMounted) {
+        return (
+            <div className={sharedStyles.container}>
+                <h1 className={sharedStyles.header}>typing test</h1>
+                <p>Memuat aplikasi...</p>
+            </div>
+        );
+    }
+
+    // Render penuh setelah komponen di-mount di klien
     return (
         <div 
             className={sharedStyles.container}
@@ -170,7 +189,7 @@ export default function Page() {
                 placeholder="Masukkan Nama Pengguna"
                 maxLength={20}
                 className={sharedStyles.input} 
-                disabled={started} // Tidak bisa diubah saat tes berjalan
+                disabled={started} 
                 style={{ marginBottom: '15px', padding: '10px', width: '90%', textAlign: 'center' }}
             />
             
@@ -208,7 +227,7 @@ export default function Page() {
                 {finished ? "RESTART (ENTER)" : "RESTART (ESC)"}
             </button>
             
-            {/* Komponen Leaderboard */}
+            {/* Komponen Leaderboard yang dimuat secara dinamis */}
             <Leaderboard latestScore={latestScore} />
         </div>
     );

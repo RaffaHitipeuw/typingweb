@@ -1,15 +1,16 @@
-"use client"; // Tambahkan ini di atas jika belum ada
+// components/Leaderboard/Leaderboard.jsx
+
+"use client";
 
 import React, { useState, useEffect } from 'react';
-// Ganti impor ke file handler yang baru
-import { getScores, clearScores } from './scoreApiHandler'; 
+// Pastikan nama file handler Anda (misalnya localStorageHandler) di-import di sini
+import { getScores } from './localStorageHandler'; 
 import './Leaderboard.css';
 
 function Leaderboard({ latestScore }) {
   const [scores, setScores] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Fungsi fetch data asinkron
   const fetchScores = async () => {
     setIsLoading(true);
     const data = await getScores();
@@ -17,23 +18,19 @@ function Leaderboard({ latestScore }) {
     setIsLoading(false);
   };
 
-  // Memuat skor saat komponen pertama kali di-render
   useEffect(() => {
     fetchScores();
   }, []);
 
-  // Memperbarui skor jika ada skor baru dari props (dipicu dari page.jsx)
   useEffect(() => {
     if (latestScore && latestScore.wpm > 0) {
       fetchScores();
     }
   }, [latestScore]);
 
-  // Handler untuk menghapus semua skor (dipertahankan dari logika lama, tapi sekarang hanya menghapus data di klien)
+  // Tombol Hapus dinonaktifkan untuk Leaderboard publik
   const handleClearScores = () => {
-    // Catatan: Dalam proyek publik, tombol ini harus dihapus atau dimodifikasi
-    // untuk menghapus hanya skor pengguna yang login.
-    alert("Untuk leaderboard publik, fitur hapus riwayat harus diimplementasikan di sisi server dengan otentikasi.");
+    alert("Fitur hapus dinonaktifkan untuk Leaderboard publik.");
   };
 
   if (isLoading) {
@@ -44,7 +41,6 @@ function Leaderboard({ latestScore }) {
     <div className="leaderboard-container">
       <h2>🏆 Global Leaderboard 🏆</h2>
       
-      {/* Tombol clear di-disable atau diubah pesannya untuk leaderboard publik */}
       <button onClick={handleClearScores} className="clear-button" disabled>
         Hapus Riwayat (Disabled)
       </button>
@@ -54,12 +50,15 @@ function Leaderboard({ latestScore }) {
       ) : (
         <ol className="score-list">
           {scores.map((score, index) => (
+            // Menggunakan score._id dari MongoDB jika ada, jika tidak pakai index
             <li key={score._id || index} className="score-item">
               <span className="wpm-display">{score.wpm} WPM</span>
+              {/* Menampilkan username yang diambil dari database */}
               <span className="accuracy-display">
                   {score.username} ({score.accuracy}% Akurasi)
               </span>
               <span className="date-display">
+                {/* Kita biarkan ini karena Leaderboard dimuat ssr:false, jadi ini aman */}
                 {new Date(score.timestamp).toLocaleDateString()}
               </span>
             </li>
