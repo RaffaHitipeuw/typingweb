@@ -6,7 +6,7 @@ import TargetText from "../components/TargetText";
 import StatsDisplay from "../components/StatsDisplay"; 
 import sharedStyles from "../components/SharedStyles.module.css"; 
 // Ganti ke nama file handler API Anda yang benar
-import { addScore } from '../components/Leaderboard/localStorageHandler'; 
+import { addScore } from '../components/leaderboard/localStorageHandler'; 
 
 // Dynamic Import untuk Leaderboard (ssr: false)
 // Ini mencegah error Hydration karena Leaderboard dimuat hanya di browser
